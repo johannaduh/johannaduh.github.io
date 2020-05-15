@@ -2,6 +2,9 @@
 title: "My Website"
 ---
 
+
+```{Rcpp}
+
 DatosPolonia<-read.csv("C:/Users/vanes/OneDrive/Escritorio/SEGUNDO CUATRIMESTRE/PROCESOS ESTOCASTICOS/AjusteCOVID_AR/POLONIA/covid Polonia.csv",sep=";",header = TRUE)
 #EVOLUCION DE CASOS CONFIRMADOS
 library(zoo)
@@ -135,5 +138,7 @@ Acumulaciondecasos<-xts(x=DatosPolonia$Casosconfirmados,order.by = fechas)
 Acumulaciondecasos
 plot(Acumulaciondecasos)
 
+
+```
 
 
