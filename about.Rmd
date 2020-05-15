@@ -2,4 +2,136 @@
 title: "About This Website"
 ---
 
-More about this website.
+DatosPolonia<-read.csv("C:/Users/vanes/OneDrive/Escritorio/SEGUNDO CUATRIMESTRE/PROCESOS ESTOCASTICOS/AjusteCOVID_AR/POLONIA/covid Polonia.csv",sep=";",header = TRUE)
+#EVOLUCION DE CASOS CONFIRMADOS
+library(zoo)
+library(xts)
+fechas<-as.Date(DatosPolonia$FECHA,"%d/%m/%y")
+fechas
+Evolucion_de_casos<-xts(x=DatosPolonia$NuevosCasos,order.by =fechas)
+Evolucion_de_casos
+plot(Evolucion_de_casos)
+
+# CASOS CONFIRMADOS ACUMULATIVOS
+Casosconfirmados<-cumsum(DatosPolonia$NuevosCasos)
+DatosPolonia$Casosconfirmados<-Casosconfirmados
+Acumulaciondecasos<-xts(x=DatosPolonia$Casosconfirmados,order.by = fechas)
+Acumulaciondecasos
+plot(Acumulaciondecasos)
+
+
+lncasosconfirmados<-as.ts(log(DatosPolonia$Casosconfirmados))
+lncasosconfirmados
+#ARIMA - (1,1,0) ESTABLE
+ajustec.confirmados<-arima(lncasosconfirmados,order=c(1,1,0))
+ajustec.confirmados$coef
+ajustec.confirmados$aic  
+ajustec.confirmados$loglik
+#PREDICCIONES
+lnPrediccionconfirmado<-predict(ajustec.confirmados,n.ahead = 20)
+lnPrediccionconfirmado
+predic_ARcconfir<-exp(lnPrediccionconfirmado[[1]])
+predic_ARcconfir
+exp(lncasosconfirmados)
+max(predic_ARcconfir)
+predic_ARcconfir==max(predic_ARcconfir)
+min(predic_ARcconfir)
+max(predic_ARcconfir)-min(predic_ARcconfir)
+
+#GRAFICA
+plot(exp(lncasosconfirmados),xlim=c(0,90),ylim=c(0,16000),ylab="Número de confirmados", xlab="Tiempo")
+lines(predic_ARcconfir,col="red")
+
+
+#ARIMA - (3,0,0) BAJISTA SUPER OPTIMISTA
+ajustec.confirmados1<-arima(lncasosconfirmados,order=c(3,0,0))
+ajustec.confirmados1$coef
+ajustec.confirmados1$aic  
+ajustec.confirmados1$loglik
+#PREDICCIONES
+lnPrediccionconfirmado1<-predict(ajustec.confirmados1,n.ahead = 20)
+lnPrediccionconfirmado1
+predic_ARcconfir1<-exp(lnPrediccionconfirmado1[[1]])
+predic_ARcconfir1
+exp(lncasosconfirmados)
+max(predic_ARcconfir1)
+predic_ARcconfir1==max(predic_ARcconfir1)
+min(predic_ARcconfir1)
+max(predic_ARcconfir1)-min(predic_ARcconfir1)
+
+#GRAFICA
+plot(exp(lncasosconfirmados),xlim=c(0,90),ylim=c(0,16000),ylab="Número de confirmados", xlab="Tiempo")
+lines(predic_ARcconfir1,col="red")
+
+
+#ARIMA - (2,0,0) #BAJISTA Y MAS REALISTA
+ajustec.confirmados2<-arima(lncasosconfirmados,order=c(2,0,0))
+ajustec.confirmados2$coef
+ajustec.confirmados2$aic  
+ajustec.confirmados2$loglik
+#PREDICCIONES
+lnPrediccionconfirmado2<-predict(ajustec.confirmados2,n.ahead = 20)
+lnPrediccionconfirmado2
+predic_ARcconfir2<-exp(lnPrediccionconfirmado2[[1]])
+predic_ARcconfir2
+exp(lncasosconfirmados)
+max(predic_ARcconfir2)
+predic_ARcconfir2==max(predic_ARcconfir2)
+min(predic_ARcconfir2)
+max(predic_ARcconfir2)-min(predic_ARcconfir2)
+
+#GRAFICA
+plot(exp(lncasosconfirmados),xlim=c(0,90),ylim=c(0,16000),ylab="Número de confirmados", xlab="Tiempo")
+lines(predic_ARcconfir2,col="red")
+
+#ARIMA - (2,1,0)  MUY ALTO
+ajustec.confirmados3<-arima(lncasosconfirmados,order=c(2,1,0))
+ajustec.confirmados3$coef
+ajustec.confirmados3$aic  
+ajustec.confirmados3$loglik
+#PREDICCIONES
+lnPrediccionconfirmado3<-predict(ajustec.confirmados3,n.ahead = 20)
+lnPrediccionconfirmado3
+predic_ARcconfir3<-exp(lnPrediccionconfirmado3[[1]])
+predic_ARcconfir3
+exp(lncasosconfirmados)
+max(predic_ARcconfir3)
+predic_ARcconfir3==max(predic_ARcconfir3)
+min(predic_ARcconfir3)
+max(predic_ARcconfir3)-min(predic_ARcconfir3)
+#GRAFICA
+plot(exp(lncasosconfirmados),xlim=c(0,90),ylim=c(0,18000),ylab="Número de confirmados", xlab="Tiempo")
+lines(predic_ARcconfir3,col="red")
+
+#COMPARATIVA
+DatosPolonia2<-read.csv("C:/Users/vanes/OneDrive/Escritorio/SEGUNDO CUATRIMESTRE/PROCESOS ESTOCASTICOS/AjusteCOVID_AR/POLONIA/covid Polonia 2.csv",sep=";",header = TRUE)
+Casosconfirmados1<-cumsum(DatosPolonia2$NuevosCasos)
+DatosPolonia2$Casosconfirmados1<-Casosconfirmados1
+lncasosconfirmados1<-as.ts(log(DatosPolonia2$Casosconfirmados1))
+lncasosconfirmados1
+plot(exp(lncasosconfirmados),xlim=c(0,90),ylim=c(0,18000),ylab="Número de confirmados", xlab="Tiempo")
+lines(predic_ARcconfir3,col="red")
+lines(Casosconfirmados1,col="green")
+
+Prediccasos<-predic_ARcconfir3[1:3]
+ObserCasos<-Casosconfirmados1[66:68]
+mean(abs(ObserCasos-Prediccasos))
+###mean absolute percentage error MAPE
+mean(abs(ObserCasos-Prediccasos)/abs(ObserCasos))*100
+###raíz del error/ la desviación cuadrátic@ medi@
+sqrt(mean((ObserCasos-Prediccasos)^2))
+
+
+
+#EVOLUCION DE MUERTOS
+Evolucion_de_MUERTES<-xts(x=DatosPolonia$NuevosMuertos,order.by =fechas)
+Evolucion_de_MUERTES
+plot(Evolucion_de_MUERTES)
+
+# CASOS FALLECIDOS ACUMULATIVOS
+Fallecidos<-cumsum(DatosPolonia$NuevosMuertos)
+DatosPolonia$Casosconfirmados<-Casosconfirmados
+Acumulaciondecasos<-xts(x=DatosPolonia$Casosconfirmados,order.by = fechas)
+Acumulaciondecasos
+plot(Acumulaciondecasos)
+
